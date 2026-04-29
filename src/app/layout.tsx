@@ -28,11 +28,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn('font-sans dark', inter.variable)}>
+    <html lang="en" className={cn('font-sans dark', inter.variable)} suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ClerkProvider>
           <RootProviders>
-            <header className="flex justify-end items-center p-4 gap-4 h-16">
+            {/* <header className="flex justify-end items-center p-4 gap-4 h-16">
               <Show when="signed-out">
                 <SignInButton />
                 <SignUpButton>
@@ -41,10 +41,8 @@ export default function RootLayout({
                   </button>
                 </SignUpButton>
               </Show>
-              <Show when="signed-in">
-                <UserButton />
-              </Show>
-            </header>
+              
+            </header> */}
             {children}
           </RootProviders>
         </ClerkProvider>

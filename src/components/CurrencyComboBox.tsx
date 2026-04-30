@@ -1,5 +1,6 @@
 'use client';
 
+import { UpadateUserCurrency } from '@/app/wizard/_actions/userSettings';
 import {
   Combobox,
   ComboboxContent,
@@ -12,13 +13,11 @@ import { UserSettings } from '@/generated/client';
 import { Currencies, Currency } from '@/lib/currencies';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
-import SkeletonWrapper from './SkeletonWrapper';
-import { UpadateUserCurrency } from '@/app/wizard/_actions/userSettings';
 import { toast } from 'sonner';
+import SkeletonWrapper from './SkeletonWrapper';
 
 export function CurrencyComboBox() {
-  const [value, setValue] = useState<string>("");
-  const queryClient = useQueryClient();
+  const [selectedOption, setSelectedOption] = useState<Currency | null>(null);
 
   const userSettings = useQuery<UserSettings>({
     queryKey: ['userSettings'],
@@ -28,41 +27,40 @@ export function CurrencyComboBox() {
   useEffect(() => {
     if (!userSettings.data) return;
     const userCurrency = Currencies.find(
-      (currency) => currency.value === userSettings.data.currency
+      (currency) => currency.value === userSettings.data.currency,
     );
     if (userCurrency) {
-      setValue(userCurrency.value);
+      setSelectedOption(userCurrency);
     }
   }, [userSettings.data]);
 
+  // 2. Mutation: Ийгиликтүү болсо билдирүү чыгарып, тандалганды жаңылайт
   const mutation = useMutation({
     mutationFn: UpadateUserCurrency,
-    onSuccess: (updatedSettings) => {
-      toast.success("Currency updated successfully 🎉", {
-        id: "update-currency",
+    onSuccess: (data: UserSettings) => {
+      toast.success(`Currency updated successfully 🎉`, {
+        id: 'update-currency',
       });
 
-      queryClient.invalidateQueries({
-        queryKey: ["userSettings"],
-      });
+      setSelectedOption(
+        Currencies.find((c) => c.value === data.currency) || null
+      );
     },
     onError: (e) => {
-      toast.error("Something went wrong", {
-        id: "update-currency",
+      toast.error('Something went wrong', {
+        id: 'update-currency',
       });
     },
   });
 
-  const selectOption = useCallback((currencyValue: string) => {
-    const currency = Currencies.find((c) => c.value === currencyValue);
-    
+  const selectOption = useCallback((currency: Currency | null) => {
     if (!currency) {
-      toast.error("Please select a valid currency");
+      toast.error("Please select a currency");
       return;
     }
 
     toast.loading("Updating currency...", {
-      id: "update-currency"
+      id: "update-currency",
     });
 
     mutation.mutate(currency.value);
@@ -72,11 +70,12 @@ export function CurrencyComboBox() {
     <SkeletonWrapper isLoading={userSettings.isFetching}>
       <Combobox
         items={Currencies}
-        value={value}
+        value={selectedOption?.value || ""}
         onValueChange={(val) => {
-          if (!val) return;
-          setValue(val);
-          selectOption(val);
+          const currency = Currencies.find((c) => c.value === val);
+          if (currency) {
+            selectOption(currency);
+          }
         }}
       >
         <ComboboxInput placeholder="Set currency" />

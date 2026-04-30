@@ -9,3 +9,4 @@ export const CreateTransactionSchema = z.object({
 })
 
 export type CreateTransactionSchemaType = z.infer<typeof CreateTransactionSchema>
+export type CreateTransactionSchemaInput = z.input<typeof CreateTransactionSchema>

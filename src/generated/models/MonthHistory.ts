@@ -215,7 +215,7 @@ export type MonthHistoryGroupByOutputType = {
   _max: MonthHistoryMaxAggregateOutputType | null
 }
 
-export type GetMonthHistoryGroupByPayload<T extends MonthHistoryGroupByArgs> = Prisma.PrismaPromise<
+type GetMonthHistoryGroupByPayload<T extends MonthHistoryGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<MonthHistoryGroupByOutputType, T['by']> &
       {
@@ -1066,11 +1066,6 @@ export type MonthHistoryFindManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Skip the first `n` MonthHistories.
    */
   skip?: number
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-   * 
-   * Filter by unique combinations of MonthHistories.
-   */
   distinct?: Prisma.MonthHistoryScalarFieldEnum | Prisma.MonthHistoryScalarFieldEnum[]
 }
 

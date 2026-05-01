@@ -50,7 +50,9 @@ const CreateTransactionDialog = ({ trigger, type }: Props) => {
     resolver: zodResolver(CreateTransactionSchema),
     defaultValues: {
       type,
+      description: '',
       date: new Date(),
+      amount: 0,
     },
   });
 
@@ -99,7 +101,7 @@ const CreateTransactionDialog = ({ trigger, type }: Props) => {
     },
     [mutate],
   );
-  
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -114,15 +116,15 @@ const CreateTransactionDialog = ({ trigger, type }: Props) => {
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className='flex flex-col'>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Input defaultValue={''} {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormDescription>Transaction description (optional)</FormDescription>
                 </FormItem>
@@ -132,10 +134,14 @@ const CreateTransactionDialog = ({ trigger, type }: Props) => {
               control={form.control}
               name="amount"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className='flex flex-col'>
                   <FormLabel>Amount</FormLabel>
                   <FormControl>
-                    <Input type="number" onChange={(e) => field.onChange(e.target.valueAsNumber)} />
+                    <Input
+                      type="number"
+                      value={field.value?.toString() ?? ''}
+                      onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
+                    />
                   </FormControl>
                   <FormDescription>Transaction amount (required)</FormDescription>
                 </FormItem>
@@ -186,7 +192,10 @@ const CreateTransactionDialog = ({ trigger, type }: Props) => {
                         <Calendar
                           mode="single"
                           selected={field.value as Date | undefined}
-                          onSelect={field.onChange}
+                          onSelect={value => {
+                            if(!value) return;
+                            field.onChange(value)
+                          }}
                         />
                       </PopoverContent>
                     </Popover>

@@ -17,8 +17,8 @@ import type * as Prisma from "./prismaNamespace"
 
 const config: runtime.GetPrismaClientConfig = {
   "previewFeatures": [],
-  "clientVersion": "7.8.0",
-  "engineVersion": "3c6e192761c0362d496ed980de936e2f3cebcd3a",
+  "clientVersion": "7.4.2",
+  "engineVersion": "94a226be1cf2967af2541cca5529f0f7ba866919",
   "activeProvider": "postgresql",
   "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel UserSettings {\n  userId   String @id\n  currency String\n}\n\nmodel Category {\n  createdAt DateTime @default(now())\n  name      String\n  userId    String\n  icon      String\n  type      String   @default(\"income\")\n\n  @@unique([name, userId, type])\n}\n\nmodel Transaction {\n  id        String   @id @default(uuid())\n  createdAt DateTime @default(now())\n  updatedAt DateTime @default(now())\n\n  amount      Float\n  description String\n  date        DateTime\n  userId      String\n  type        String   @default(\"income\")\n\n  category     String\n  categoryIcon String\n}\n\nmodel MonthHistory {\n  userId  String\n  day     Int\n  month   Int\n  year    Int\n  income  Float\n  expense Float\n\n  @@id([day, month, year, userId])\n}\n\nmodel YearHistory {\n  userId  String\n  month   Int\n  year    Int\n  income  Float\n  expense Float\n\n  @@id([month, year, userId])\n}\n",
   "runtimeDataModel": {
@@ -180,7 +180,7 @@ export interface PrismaClient<
    * 
    * Read more in our [docs](https://www.prisma.io/docs/orm/prisma-client/queries/transactions).
    */
-  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): runtime.Types.Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
+  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): runtime.Types.Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
 
   $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => runtime.Types.Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): runtime.Types.Utils.JsPromise<R>
 

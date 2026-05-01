@@ -21,6 +21,7 @@ import CreateCategoryDialog from './CreateCategoryDialog';
 interface Props {
   type: TransactionType;
   onChange: (value: string) => void;
+  value?: string;
 }
 const CategoryPicker = ({ type, onChange }: Props) => {
   const [open, setOpen] = useState(false);

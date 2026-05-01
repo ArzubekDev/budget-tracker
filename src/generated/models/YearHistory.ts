@@ -204,7 +204,7 @@ export type YearHistoryGroupByOutputType = {
   _max: YearHistoryMaxAggregateOutputType | null
 }
 
-export type GetYearHistoryGroupByPayload<T extends YearHistoryGroupByArgs> = Prisma.PrismaPromise<
+type GetYearHistoryGroupByPayload<T extends YearHistoryGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<YearHistoryGroupByOutputType, T['by']> &
       {
@@ -1023,11 +1023,6 @@ export type YearHistoryFindManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Skip the first `n` YearHistories.
    */
   skip?: number
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-   * 
-   * Filter by unique combinations of YearHistories.
-   */
   distinct?: Prisma.YearHistoryScalarFieldEnum | Prisma.YearHistoryScalarFieldEnum[]
 }
 

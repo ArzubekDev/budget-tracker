@@ -97,7 +97,7 @@ export const TransactionScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  amont: 'amont',
+  amount: 'amount',
   description: 'description',
   date: 'date',
   userId: 'userId',

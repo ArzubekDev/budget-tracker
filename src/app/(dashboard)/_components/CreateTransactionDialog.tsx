@@ -1,5 +1,7 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Dialog,
   DialogContent,
@@ -14,9 +16,10 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Popover } from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { TransactionType } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import {
@@ -25,6 +28,8 @@ import {
   CreateTransactionSchemaType,
 } from '@/schema/transaction';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
 import { ReactNode, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import CategoryPicker from './CategoryPicker';
@@ -113,15 +118,57 @@ const CreateTransactionDialog = ({ trigger, type }: Props) => {
                   <FormItem>
                     <FormLabel>Transaction date</FormLabel>
                     <Popover>
-                      
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={'outline'}
+                            className={cn(
+                              'w-50 pl-3 text-left font-normal',
+                              !field.value && 'text-muted-foreground',
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value as Date, 'PPP')
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={field.value as Date | undefined}
+                          onSelect={field.onChange}
+                        />
+                      </PopoverContent>
                     </Popover>
                     <FormDescription>Select a date for this transaction</FormDescription>
+                    <FormMessage/>
                   </FormItem>
                 )}
               />
             </div>
           </form>
         </Form>
+        <DialogFooter>
+                  <DialogClose asChild>
+                    <Button
+                      type="button"
+                      variant={'secondary'}
+                      onClick={() => {
+                        form.reset();
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </DialogClose>
+                  <Button onClick={form.handleSubmit(onSubmit)} disabled={isPending}>
+                    {!isPending && 'Create'}
+                    {isPending &&  <Loader2 className="animate-spin" />}
+                  </Button>
+                </DialogFooter>
       </DialogContent>
     </Dialog>
   );

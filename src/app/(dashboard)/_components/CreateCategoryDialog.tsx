@@ -32,12 +32,14 @@ import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { CreateCategory } from '../_actions/categories';
+import { useTheme } from 'next-themes';
 
 interface CreateCategoryDialogProps {
   type: TransactionType;
+  successCallback: (category: Category) => void
 }
 
-const CreateCategoryDialog = ({ type }: CreateCategoryDialogProps) => {
+const CreateCategoryDialog = ({ type, successCallback }: CreateCategoryDialogProps) => {
   const [open, setOpen] = useState(false);
   const form = useForm<CreateCategorySchemaType>({
     resolver: zodResolver(CreateCategorySchema),
@@ -49,6 +51,7 @@ const CreateCategoryDialog = ({ type }: CreateCategoryDialogProps) => {
   });
 
   const queryClient = useQueryClient();
+  const theme = useTheme()
 
   const { mutate, isPending } = useMutation({
     mutationFn: CreateCategory,
@@ -61,6 +64,9 @@ const CreateCategoryDialog = ({ type }: CreateCategoryDialogProps) => {
       toast.success(`Category ${data.name} created successfully 🎉`, {
         id: 'create-category',
       });
+
+      successCallback(data)
+
       await queryClient.invalidateQueries({
         queryKey: ['categories'],
       });
@@ -114,9 +120,9 @@ const CreateCategoryDialog = ({ type }: CreateCategoryDialogProps) => {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input placeholder='Category' {...field} />
                   </FormControl>
-                  <FormDescription>Transaction description (optional)</FormDescription>
+                  <FormDescription>This is how your category will appear in the app</FormDescription>
                 </FormItem>
               )}
             />
@@ -149,6 +155,7 @@ const CreateCategoryDialog = ({ type }: CreateCategoryDialogProps) => {
                       <PopoverContent className="w-full">
                         <Picker
                           data={data}
+                          theme={theme.resolvedTheme}
                           onEmojiSelect={(emoji: { native: string }) => {
                             field.onChange(emoji.native);
                           }}

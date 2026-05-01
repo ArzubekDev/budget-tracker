@@ -1,12 +1,21 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Command, CommandEmpty, CommandInput } from '@/components/ui/command';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Category } from '@/generated/client';
 import { TransactionType } from '@/lib/types';
+import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { useCallback, useState } from 'react';
 import CreateCategoryDialog from './CreateCategoryDialog';
 
 interface Props {
@@ -24,6 +33,11 @@ const CategoryPicker = ({ type }: Props) => {
   const selectedCategory = categoriesQuery.data?.find(
     (category: Category) => category.name === value,
   );
+
+  const successCallback = useCallback((category: Category) => {
+    setValue(category.name);
+    setOpen((prev) => !prev);
+  }, [setValue, setOpen])
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -34,6 +48,7 @@ const CategoryPicker = ({ type }: Props) => {
           className="w-50 justify-between"
         >
           {selectedCategory ? <CategoryRow category={selectedCategory} /> : 'Select category'}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-50 p-0">
@@ -43,13 +58,33 @@ const CategoryPicker = ({ type }: Props) => {
           }}
         >
           <CommandInput placeholder="Search category..." />
-          <CreateCategoryDialog type={type} />
+          <CreateCategoryDialog type={type} successCallback={successCallback} />
           <CommandEmpty>
             <p>Category not found</p>
-            <p className='text-xs text-muted-foreground'>
-              Tip: Create a new category
-            </p>
+            <p className="text-xs text-muted-foreground">Tip: Create a new category</p>
           </CommandEmpty>
+          <CommandGroup>
+            <CommandList>
+              {categoriesQuery.data &&
+                categoriesQuery.data.map((category: Category) => (
+                  <CommandItem
+                    key={category.name}
+                    onSelect={() => {
+                      setValue(category.name);
+                      setOpen((prev) => !prev);
+                    }}
+                  >
+                    <CategoryRow category={category} />
+                    <Check
+                      className={cn(
+                        'mr-2 w-4 h-4 opacity-0',
+                        value === category.name && 'opacity-100',
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+            </CommandList>
+          </CommandGroup>
         </Command>
       </PopoverContent>
     </Popover>

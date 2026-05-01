@@ -7,6 +7,7 @@ import { Category } from '@/generated/client';
 import { TransactionType } from '@/lib/types';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import CreateCategoryDialog from './CreateCategoryDialog';
 
 interface Props {
   type: TransactionType;
@@ -35,11 +36,14 @@ const CategoryPicker = ({ type }: Props) => {
           {selectedCategory ? <CategoryRow category={selectedCategory} /> : 'Select category'}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className='w-50 p-0'>
-        <Command onSubmit={e => {
-            e.preventDefault()
-        }}>
-            <CommandInput placeholder='Search category...'/>
+      <PopoverContent className="w-50 p-0">
+        <Command
+          onSubmit={(e) => {
+            e.preventDefault();
+          }}
+        >
+          <CommandInput placeholder="Search category..." />
+          <CreateCategoryDialog type={type} />
         </Command>
       </PopoverContent>
     </Popover>
@@ -48,11 +52,11 @@ const CategoryPicker = ({ type }: Props) => {
 
 export default CategoryPicker;
 
-function CategoryRow ({category}: {category: Category}){
-    return (
-        <div className='flex items-center gap-2'>
-            <span role='img'>{category.icon}</span>
-            <span>{category.name}</span>
-        </div>
-    )
+function CategoryRow({ category }: { category: Category }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span role="img">{category.icon}</span>
+      <span>{category.name}</span>
+    </div>
+  );
 }

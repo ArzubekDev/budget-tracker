@@ -16,6 +16,7 @@ import {
   FormLabel,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Popover } from '@/components/ui/popover';
 import { TransactionType } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import {
@@ -24,7 +25,7 @@ import {
   CreateTransactionSchemaType,
 } from '@/schema/transaction';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ReactNode } from 'react';
+import { ReactNode, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import CategoryPicker from './CategoryPicker';
 
@@ -41,6 +42,13 @@ const CreateTransactionDialog = ({ trigger, type }: Props) => {
       date: new Date(),
     },
   });
+
+  const handleCategoryChange = useCallback(
+    (value: string) => {
+      form.setValue('category', value);
+    },
+    [form],
+  );
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -76,15 +84,13 @@ const CreateTransactionDialog = ({ trigger, type }: Props) => {
                 <FormItem>
                   <FormLabel>Amount</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                    />
+                    <Input type="number" onChange={(e) => field.onChange(e.target.valueAsNumber)} />
                   </FormControl>
                   <FormDescription>Transaction amount (required)</FormDescription>
                 </FormItem>
               )}
             />
+            Transaction: {form.watch('category')}
             <div className="flex items-center justify-between gap-2">
               <FormField
                 control={form.control}
@@ -93,9 +99,23 @@ const CreateTransactionDialog = ({ trigger, type }: Props) => {
                   <FormItem>
                     <FormLabel>Category</FormLabel>
                     <FormControl>
-                      <CategoryPicker type={type}/>
+                      <CategoryPicker type={type} onChange={handleCategoryChange} />
                     </FormControl>
                     <FormDescription>Select a category for this transaction</FormDescription>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Transaction date</FormLabel>
+                    <Popover>
+                      
+                    </Popover>
+                    <FormDescription>Select a date for this transaction</FormDescription>
                   </FormItem>
                 )}
               />

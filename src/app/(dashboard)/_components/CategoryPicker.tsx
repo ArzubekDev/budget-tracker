@@ -15,15 +15,21 @@ import { TransactionType } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { Check, ChevronsUpDown } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import CreateCategoryDialog from './CreateCategoryDialog';
 
 interface Props {
   type: TransactionType;
+  onChange: (value: string) => void;
 }
-const CategoryPicker = ({ type }: Props) => {
+const CategoryPicker = ({ type, onChange }: Props) => {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');
+
+  useEffect(() => {
+    if (!value) return;
+    onChange(value);
+  }, [onChange, value]);
 
   const categoriesQuery = useQuery({
     queryKey: ['categories', type],
@@ -34,10 +40,13 @@ const CategoryPicker = ({ type }: Props) => {
     (category: Category) => category.name === value,
   );
 
-  const successCallback = useCallback((category: Category) => {
-    setValue(category.name);
-    setOpen((prev) => !prev);
-  }, [setValue, setOpen])
+  const successCallback = useCallback(
+    (category: Category) => {
+      setValue(category.name);
+      setOpen((prev) => !prev);
+    },
+    [setValue, setOpen],
+  );
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>

@@ -1,8 +1,12 @@
 import { GetBalanceStatsResponseType } from '@/app/api/stats/balance/routes';
+import SkeletonWrapper from '@/components/SkeletonWrapper';
+import { Card } from '@/components/ui/card';
 import { UserSettings } from '@/generated/client';
 import { DateToUTCDate, GetFormatterForCurrency } from '@/lib/helpers';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { TrendingUp } from 'lucide-react';
+import { ReactNode, useCallback, useMemo } from 'react';
+import CountUp from 'react-countup'
 
 interface Props {
   from: Date;
@@ -28,7 +32,49 @@ const StatsCards = ({ from, to, userSettings }: Props) => {
 
   const balance = income - expense;
 
-  return <div className='relative flex w-full flex-wrap gap-2 md:flex-nowrap'></div>;
+  return (
+    <div className="relative flex w-full flex-wrap gap-2 md:flex-nowrap">
+      <SkeletonWrapper isLoading={statsQuery.isFetching}>
+        <StatsCard
+          formatter={formatter}
+          value={income}
+          title="income"
+          icon={
+            <TrendingUp className="w-12 h-12 items-center rounded-lg p-2 text-emerald-500 bg-emerald-400/10" />
+          }
+        />
+      </SkeletonWrapper>
+    </div>
+  );
 };
 
 export default StatsCards;
+
+function StatsCard({
+  formatter,
+  value,
+  title,
+  icon,
+}: {
+  formatter: Intl.NumberFormat;
+  icon: ReactNode;
+  title: string;
+  value: number;
+}) {
+  const formatFn = useCallback(
+    (value: number) => {
+      return formatter.format(value);
+    },
+    [formatter],
+  );
+
+  return (
+    <Card className="flex h-24 w-full items-center gap-2 p-4">
+      {icon}
+      <div className="flex flex-col items-center gap-0">
+        <p className="text-muted-foreground">{title}</p>
+        <CountUp preserveValue redraw={false} end={value} decimals={2} formattingFn={formatFn} className='text-2xl'/>
+      </div>
+    </Card>
+  );
+}

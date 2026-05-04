@@ -1,12 +1,12 @@
-import { GetBalanceStatsResponseType } from '@/app/api/stats/balance/routes';
+import { GetBalanceStatsResponseType } from '@/app/api/stats/balance/route';
 import SkeletonWrapper from '@/components/SkeletonWrapper';
 import { Card } from '@/components/ui/card';
 import { UserSettings } from '@/generated/client';
 import { DateToUTCDate, GetFormatterForCurrency } from '@/lib/helpers';
 import { useQuery } from '@tanstack/react-query';
-import { TrendingUp } from 'lucide-react';
+import { TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import { ReactNode, useCallback, useMemo } from 'react';
-import CountUp from 'react-countup'
+import CountUp from 'react-countup';
 
 interface Props {
   from: Date;
@@ -38,9 +38,29 @@ const StatsCards = ({ from, to, userSettings }: Props) => {
         <StatsCard
           formatter={formatter}
           value={income}
-          title="income"
+          title="Income"
           icon={
             <TrendingUp className="w-12 h-12 items-center rounded-lg p-2 text-emerald-500 bg-emerald-400/10" />
+          }
+        />
+      </SkeletonWrapper>
+      <SkeletonWrapper isLoading={statsQuery.isFetching}>
+        <StatsCard
+          formatter={formatter}
+          value={expense}
+          title="Expense"
+          icon={
+            <TrendingDown className="w-12 h-12 items-center rounded-lg p-2 text-rose-500 bg-rose-400/10" />
+          }
+        />
+      </SkeletonWrapper>
+      <SkeletonWrapper isLoading={statsQuery.isFetching}>
+        <StatsCard
+          formatter={formatter}
+          value={balance}
+          title="Balance"
+          icon={
+            <Wallet className="w-12 h-12 items-center rounded-lg p-2 text-violet-500 bg-violet-400/10" />
           }
         />
       </SkeletonWrapper>
@@ -69,12 +89,21 @@ function StatsCard({
   );
 
   return (
-    <Card className="flex h-24 w-full items-center gap-2 p-4">
-      {icon}
-      <div className="flex flex-col items-center gap-0">
+    <Card className="flex  w-full items-start gap-2 p-4">
+     <div className='flex gap-2 items-start justify-center'>
+       <div className="flex items-center justify-center">{icon}</div>
+      <div className="flex flex-col">
         <p className="text-muted-foreground">{title}</p>
-        <CountUp preserveValue redraw={false} end={value} decimals={2} formattingFn={formatFn} className='text-2xl'/>
+        <CountUp
+          preserveValue
+          redraw={false}
+          end={value}
+          decimals={2}
+          formattingFn={formatFn}
+          className="text-2xl font-bold"
+        />
       </div>
+     </div>
     </Card>
   );
 }

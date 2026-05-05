@@ -128,17 +128,22 @@ const History = ({ userSettings }: { userSettings: UserSettings }) => {
 
 export default History;
 
-interface CustomTooltipProps {
-  active?: boolean;
-  payload?: ReadonlyArray<{
-    value?: unknown;
-    name?: unknown;
-  }>;
-  formatter?: unknown;
-}
 
-function CustomTooltip({ active, payload }: CustomTooltipProps) {
+function CustomTooltip({ active, payload, formatter }: any) {
   if (!active || !payload || payload.length === 0) return null;
 
-  return <div className=""></div>;
+  const data = payload[0].payload
+  const {expense, income} = data
+
+  return (
+    <div className="min-w-75 rounded border bg-background p-4">
+      <TooltipRow
+        formatter={formatter}
+        label="Expense"
+        value={expense}
+        bgColor="bg-rose-500"
+        textColor="text-rose-500"
+      />
+    </div>
+  );
 }

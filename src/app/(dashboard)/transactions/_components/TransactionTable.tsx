@@ -2,6 +2,7 @@
 
 import { GetTransactionsHistoryResponseType } from '@/app/api/transactions-history/route';
 import { DataTableColumnHeader } from '@/components/datatable/ColumnHeader';
+import { DataTableFacetedFilter } from '@/components/datatable/FacetedFilters';
 import SkeletonWrapper from '@/components/SkeletonWrapper';
 import {
   Table,
@@ -16,13 +17,16 @@ import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import {
   ColumnDef,
+  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
+  getFacetedRowModel,
+  getFilteredRowModel,
   getSortedRowModel,
   SortingState,
   useReactTable,
 } from '@tanstack/react-table';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 interface Props {
   from: Date;
@@ -35,6 +39,9 @@ export const columns: ColumnDef<TransactionHistoryRow>[] = [
   {
     accessorKey: 'category',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Category" />,
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
     cell: ({ row }) => (
       <div className="flex gap2 capitalize">
         {row.original.categoryIcon}
@@ -64,6 +71,9 @@ export const columns: ColumnDef<TransactionHistoryRow>[] = [
   {
     accessorKey: 'type',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
     cell: ({ row }) => (
       <div
         className={cn(
@@ -88,6 +98,7 @@ export const columns: ColumnDef<TransactionHistoryRow>[] = [
 ];
 const TransactionTable = ({ from, to }: Props) => {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const history = useQuery<GetTransactionsHistoryResponseType>({
     queryKey: ['transactions', 'history', from, to],
@@ -103,14 +114,50 @@ const TransactionTable = ({ from, to }: Props) => {
     getCoreRowModel: getCoreRowModel(),
     state: {
       sorting,
+      columnFilters,
     },
+    getFacetedRowModel: getFacetedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnFiltersChange: setColumnFilters,
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
   });
 
+  const categoriesOptions = useMemo(() => {
+    const categoriesMap = new Map();
+    history.data?.forEach((transaction) => {
+      categoriesMap.set(transaction.category, {
+        value: transaction.category,
+        label: `${transaction.categoryIcon} ${transaction.category}`,
+      });
+    });
+    const uniqueCategories = new Set(categoriesMap.values());
+    return Array.from(uniqueCategories);
+  }, [history.data]);
+
   return (
     <div className="w-full">
-      <div className="flex justify-between gap-2 flex-wrap items-end py-4">TODO: Filters</div>
+      <div className="flex justify-between gap-2 flex-wrap items-end py-4">
+        <div className="flex gap-2">
+          {table.getColumn('category') && (
+            <DataTableFacetedFilter
+              title="Category"
+              column={table.getColumn('category')}
+              options={categoriesOptions}
+            />
+          )}
+          {table.getColumn('type') && (
+            <DataTableFacetedFilter
+              title="Type"
+              column={table.getColumn('type')}
+              options={[
+                { value: 'income', label: 'Income' },
+                { value: 'expense', label: 'Expense' },
+              ]}
+            />
+          )}
+        </div>
+      </div>
       <SkeletonWrapper isLoading={history.isFetching}>
         <div className="overflow-hidden rounded-md border">
           <Table>

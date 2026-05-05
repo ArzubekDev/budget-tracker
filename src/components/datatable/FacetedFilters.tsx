@@ -92,12 +92,13 @@ export function DataTableFacetedFilter<TData, TValue>({
                   <CommandItem
                     key={option.value}
                     onSelect={() => {
+                      const newSelectedValues = new Set(selectedValues)
                       if (isSelected) {
-                        selectedValues.delete(option.value)
+                        newSelectedValues.delete(option.value)
                       } else {
-                        selectedValues.add(option.value)
+                        newSelectedValues.add(option.value)
                       }
-                      const filterValues = Array.from(selectedValues)
+                      const filterValues = Array.from(newSelectedValues)
                       column?.setFilterValue(
                         filterValues.length ? filterValues : undefined
                       )
@@ -118,7 +119,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                     )}
                     <span>{option.label}</span>
                     {facets?.get(option.value) && (
-                      <span className="ml-auto flex size-4 items-center justify-center font-mono text-xs text-muted-foreground">
+                      <span className="ml-auto inline-flex items-center justify-center rounded px-2 py-1 font-mono text-xs text-muted-foreground">
                         {facets.get(option.value)}
                       </span>
                     )}

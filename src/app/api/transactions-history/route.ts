@@ -34,6 +34,8 @@ export async function GET(request: Request) {
   return transactions;
 }
 
+export type GetTransactionsHistoryResponseType = Awaited<ReturnType<typeof getTransactionsHistory>>;
+
 async function getTransactionsHistory(userId: string, from: Date, to: Date) {
   const userSettings = await prisma.userSettings.findUnique({
     where: {

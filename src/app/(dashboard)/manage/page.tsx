@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { PlusSquare, TrashIcon, TrendingDown, TrendingUp } from 'lucide-react';
 import CreateCategoryDialog from '../_components/CreateCategoryDialog';
+import DeleteCategoryDialog from '../_components/DeleteCategoryDialog';
 
 function Page() {
   return (
@@ -51,7 +52,7 @@ function CategoryList({ type }: { type: TransactionType }) {
 
   const dataAvailable = categoriesQuery.data && categoriesQuery.data.length > 0;
   return (
-    <SkeletonWrapper isLoading={categoriesQuery.isFetching}>
+    <SkeletonWrapper isLoading={categoriesQuery.isLoading}>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between gap-2">
@@ -112,12 +113,17 @@ function CategoryCard({ category }: { category: Category }) {
         </span>
         <span>{category.name}</span>
       </div>
-      <Button
-        className="cursor-pointer flex w-full border-separate items-center gap-2 rounded-t-none rounded-b-md text-muted-foreground hover:bg-red-500/20"
-        variant={'secondary'}
-      >
-        <TrashIcon className="w-4 h-4" /> Remove
-      </Button>
+      <DeleteCategoryDialog
+        category={category}
+        trigger={
+          <Button
+            className="cursor-pointer flex w-full border-separate items-center gap-2 rounded-t-none rounded-b-md text-muted-foreground hover:bg-red-500/20"
+            variant={'secondary'}
+          >
+            <TrashIcon className="w-4 h-4" /> Remove
+          </Button>
+        }
+      />
     </div>
   );
 }

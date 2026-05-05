@@ -6,8 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserSettings } from '@/generated/client';
 import { GetFormatterForCurrency } from '@/lib/helpers';
 import { Period, Timeframe } from '@/lib/types';
+import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import CountUp from 'react-countup';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import HistoryPeriodSelector from './HistoryPeriodSelector';
 
@@ -128,12 +130,11 @@ const History = ({ userSettings }: { userSettings: UserSettings }) => {
 
 export default History;
 
-
 function CustomTooltip({ active, payload, formatter }: any) {
   if (!active || !payload || payload.length === 0) return null;
 
-  const data = payload[0].payload
-  const {expense, income} = data
+  const data = payload[0].payload;
+  const { expense, income } = data;
 
   return (
     <div className="min-w-75 rounded border bg-background p-4">
@@ -144,6 +145,56 @@ function CustomTooltip({ active, payload, formatter }: any) {
         bgColor="bg-rose-500"
         textColor="text-rose-500"
       />
+      <TooltipRow
+        formatter={formatter}
+        label="Income"
+        value={income}
+        bgColor="bg-emerald-500"
+        textColor="text-emerald-500"
+      />
+      <TooltipRow
+        formatter={formatter}
+        label="Balance"
+        value={income - expense}
+        bgColor="bg-gray-100"
+        textColor="text-foreground"
+      />
+    </div>
+  );
+}
+
+function TooltipRow({
+  label,
+  value,
+  bgColor,
+  textColor,
+  formatter,
+}: {
+  label: string;
+  value: number;
+  bgColor: string;
+  textColor: string;
+  formatter: Intl.NumberFormat;
+}) {
+  const formatterFn = useCallback((value: number) => {
+    return formatter.format(value)
+  }, [formatter])
+  return (
+    <div className="flex items-center gap-2">
+      <div className={cn('h-4 w-4 rounded-full', bgColor)} />
+      <div className="flex w-full justify-between">
+        <p className="text-sm text-muted-foreground">{label}</p>
+        <div className={cn('text-sm font-bold', textColor)}>
+          <CountUp
+            duration={0.5}
+            preserveValue
+            end={value}
+            decimals={0}
+            formattingFn={formatterFn}
+            className="text-sm"
+          />
+        </div>
+      </div>
     </div>
   );
 }

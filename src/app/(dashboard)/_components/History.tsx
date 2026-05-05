@@ -1,16 +1,18 @@
 'use client';
 
+import SkeletonWrapper from '@/components/SkeletonWrapper';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserSettings } from '@/generated/client';
 import { GetFormatterForCurrency } from '@/lib/helpers';
 import { Period, Timeframe } from '@/lib/types';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import HistoryPeriodSelector from './HistoryPeriodSelector';
 
 const History = ({ userSettings }: { userSettings: UserSettings }) => {
-  const [timeframe, setTiemframe] = useState<Timeframe>('month');
+  const [timeframe, setTimeframe] = useState<Timeframe>('month');
   const [period, setPeriod] = useState<Period>({
     month: new Date().getMonth(),
     year: new Date().getFullYear(),
@@ -28,10 +30,10 @@ const History = ({ userSettings }: { userSettings: UserSettings }) => {
       ).then((res) => res.json()),
   });
 
-  const dataAviable = historyDataQuery.data && historyDataQuery.data.lenght > 0;
+  const dataAviable = historyDataQuery.data && historyDataQuery.data.length > 0;
 
   return (
-    <div className="container">
+    <div className="container pb-12">
       <h2 className="mt-12 text-3xl font-bold">History</h2>
       <Card className="col-span-12 mt-2 w-full">
         <CardHeader className="gap-2">
@@ -40,7 +42,7 @@ const History = ({ userSettings }: { userSettings: UserSettings }) => {
               period={period}
               setPeriod={setPeriod}
               timeframe={timeframe}
-              setTimeframe={setTiemframe}
+              setTimeframe={setTimeframe}
             />
             <div className="flex h-10 gap-2">
               <Badge variant={'outline'} className="flex items-center gap-2 text-sm">
@@ -54,9 +56,89 @@ const History = ({ userSettings }: { userSettings: UserSettings }) => {
             </div>
           </CardTitle>
         </CardHeader>
+        <CardContent>
+          <SkeletonWrapper isLoading={historyDataQuery.isFetching}>
+            {dataAviable && (
+              <ResponsiveContainer width={'100%'} height={300}>
+                <BarChart height={300} data={historyDataQuery.data} barCategoryGap={5}>
+                  <defs>
+                    <linearGradient id="incomeBar" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset={'0'} stopColor="#10b981" stopOpacity={'1'} />
+                      <stop offset={'1'} stopColor="#10b981" stopOpacity={'0'} />
+                    </linearGradient>
+                    <linearGradient id="expenseBar" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset={'0'} stopColor="#ff2056" stopOpacity={'1'} />
+                      <stop offset={'1'} stopColor="#ff2056" stopOpacity={'0'} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray={'5 5'} strokeOpacity={'0.2'} vertical={false} />
+                  <XAxis
+                    stroke="#888888"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    padding={{ left: 5, right: 5 }}
+                    dataKey={(data) => {
+                      const { year, month, day } = data;
+                      const date = new Date(year, month, day || 1);
+                      if (timeframe === 'year') {
+                        return date.toLocaleDateString('default', {
+                          month: 'long',
+                        });
+                      }
+                      return date.toLocaleDateString('default', {
+                        day: '2-digit',
+                      });
+                    }}
+                  />
+                  <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                  <Bar
+                    dataKey={'income'}
+                    fill="url(#incomeBar)"
+                    radius={4}
+                    className="cursor-pointer"
+                  />
+                  <Bar
+                    dataKey={'expense'}
+                    fill="url(#expenseBar)"
+                    radius={4}
+                    className="cursor-pointer"
+                  />
+                  <Tooltip
+                    cursor={{ opacity: 0.1 }}
+                    content={(props) => <CustomTooltip formatter={formatter} {...props} />}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+            {!dataAviable && (
+              <Card className="flex flex-col h-75 items-center justify-center bg-background">
+                No data for the selected period
+                <p className="text-sm text-muted-foreground">
+                  Try selecting a different period or adding new transactions
+                </p>
+              </Card>
+            )}
+          </SkeletonWrapper>
+        </CardContent>
       </Card>
     </div>
   );
 };
 
 export default History;
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: ReadonlyArray<{
+    value?: unknown;
+    name?: unknown;
+  }>;
+  formatter?: unknown;
+}
+
+function CustomTooltip({ active, payload }: CustomTooltipProps) {
+  if (!active || !payload || payload.length === 0) return null;
+
+  return <div className=""></div>;
+}

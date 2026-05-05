@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     queryParams.data.to,
   );
 
-  return transactions;
+  return Response.json(transactions);
 }
 
 export type GetTransactionsHistoryResponseType = Awaited<ReturnType<typeof getTransactionsHistory>>;

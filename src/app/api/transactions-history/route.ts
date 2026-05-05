@@ -1,9 +1,11 @@
+import { GetFormatterForCurrency } from '@/lib/helpers';
+import prisma from '@/lib/prisma';
 import { OverviewQuerySchema } from '@/schema/overview';
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
 export async function GET(request: Request) {
-  const user = currentUser();
+  const user = await currentUser();
   if (!user) {
     redirect('/sign-in');
   }
@@ -22,4 +24,43 @@ export async function GET(request: Request) {
       status: 400,
     });
   }
+
+  const transactions = await getTransactionsHistory(
+    user.id,
+    queryParams.data.from,
+    queryParams.data.to,
+  );
+
+  return transactions;
+}
+
+async function getTransactionsHistory(userId: string, from: Date, to: Date) {
+  const userSettings = await prisma.userSettings.findUnique({
+    where: {
+      userId,
+    },
+  });
+  if (!userSettings) {
+    throw new Error('user settings not found');
+  }
+
+  const formatter = GetFormatterForCurrency(userSettings.currency);
+
+  const transactions = await prisma.transaction.findMany({
+    where: {
+      userId,
+      date: {
+        gte: from,
+        lte: to,
+      },
+    },
+    orderBy: {
+      date: 'desc',
+    },
+  });
+
+  return transactions.map((transactions) => ({
+    ...transactions,
+    formattedAmount: formatter.format(transactions.amount),
+  }));
 }

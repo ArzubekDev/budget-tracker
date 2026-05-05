@@ -48,7 +48,9 @@ const TransactionTable = ({ from, to }: Props) => {
   });
 
   return (
-    <SkeletonWrapper isLoading={history.isFetching}>
+   <div className='w-full'>
+    <div className='flex justify-between gap-2 flex-wrap items-end py-4'>TODO: Filters</div>
+     <SkeletonWrapper isLoading={history.isFetching}>
       <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
@@ -88,6 +90,7 @@ const TransactionTable = ({ from, to }: Props) => {
         </Table>
       </div>
     </SkeletonWrapper>
+   </div>
   );
 };
 

@@ -147,7 +147,7 @@ const CreateTransactionDialog = ({ trigger, type }: Props) => {
                 </FormItem>
               )}
             />
-            Transaction: {form.watch('category')}
+           <span className="bg-linear-to-r from-amber-400 to-orange-500 bg-clip-text font-bold leading-tight text-transparent"> Transaction: {form.watch('category')}</span>
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <FormField
                 control={form.control}

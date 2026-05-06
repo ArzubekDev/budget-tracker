@@ -27,21 +27,21 @@ const Page = async () => {
       </div>
 
       <Separator />
-      <Card className='w-full'>
-<CardHeader>
-    <CardTitle>Currency</CardTitle>
-    <CardDescription>Set your default currency for transactions</CardDescription>
-</CardHeader>
-<CardContent>
-<CurrencyComboBox/>
-</CardContent>
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Currency</CardTitle>
+          <CardDescription>Set your default currency for transactions</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <CurrencyComboBox />
+        </CardContent>
       </Card>
-      <Separator/>
-      <Button className='w-full' asChild>
+      <Separator />
+      <Button className="w-full" asChild>
         <Link href={'/'}>I&apos;m done! Take me to the dashboard</Link>
       </Button>
       <div className="mt-8">
-        <Logo/>
+        <Logo />
       </div>
     </div>
   );

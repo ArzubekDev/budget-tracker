@@ -1,9 +1,18 @@
 'use client';
 
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { DeleteTransaction } from "../_actions/deleteTransaction";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { DeleteTransaction } from '../_actions/deleteTransaction';
 
 interface Props {
   open: boolean;
@@ -11,7 +20,7 @@ interface Props {
   transactionId: string;
 }
 const DeleteTransactionDialog = ({ open, setOpen, transactionId }: Props) => {
-   const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
     mutationFn: DeleteTransaction,
